@@ -1,0 +1,33 @@
+[project]
+name = "know"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Ingo Fruend", email = "ingo@oudyo.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "mcp[cli]>=1.27.0",
+    "torch>=2.9",
+    "sentence-transformers>=3.3.1",
+    "typer>=0.24.1",
+    "hnswlib>=0.8.0",
+]
+
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+
+[project.scripts]
+know = "know:app"
+
+[build-system]
+requires = ["uv_build>=0.9.6,<0.10.0"]
+build-backend = "uv_build"
