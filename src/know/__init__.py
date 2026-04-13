@@ -31,22 +31,22 @@ def mcp():
     server = FastMCP("know", json_response=True)
     model = SentenceTransformer("all-MiniLM-L6-v2")
 
-    with vector_index() as (idx, toc):
 
-        @server.tool()
-        def search_project_knowledge(
-            topic: str, limit: int = 5, threshold: float = 0.5
-        ) -> list[str]:
-            """Search the project's knowledge base for content related to "topic".
+    @server.tool()
+    def search_project_knowledge(
+        topic: str, limit: int = 5, threshold: float = 0.5
+    ) -> list[str]:
+        """Search the project's knowledge base for content related to "topic".
 
-            Args;
-                topic: Brief description of what to search for
-                limit: maximum number of items to retrieve
-                threshold: suppress items with cosine distance larger than this threshold
+        Args;
+            topic: Brief description of what to search for
+            limit: maximum number of items to retrieve
+            threshold: suppress items with cosine distance larger than this threshold
 
-            Returns:
-                list of filenames (ordered by relevance)
-            """
+        Returns:
+            list of filenames (ordered by relevance)
+        """
+        with vector_index() as (idx, toc):
             inv_toc = {v: k for k, v in toc.items()}
             query = model.encode(topic)
             neighbors, distances = idx.knn_query(query, k=min(limit, len(toc)))
@@ -54,17 +54,18 @@ def mcp():
                 inv_toc[n] for n, d in zip(neighbors[0], distances[0]) if d < threshold
             ]
 
-        @server.tool()
-        def store_project_knowledge(title: str, text: str) -> Path:
-            """Store new project knowledge in the project's knowledge base
+    @server.tool()
+    def store_project_knowledge(title: str, text: str) -> Path:
+        """Store new project knowledge in the project's knowledge base
 
-            Args:
-                title: Title of the note
-                text: descriptive text of the note
+        Args:
+            title: Title of the note
+            text: descriptive text of the note
 
-            Returns:
-                Path of the stored model
-            """
+        Returns:
+            Path of the stored model
+        """
+        with vector_index() as (idx, toc):
             path = get_knowledge_path() / f"{title}.md"
             i = 0
             while path.exists():
@@ -77,7 +78,7 @@ def mcp():
             idx.add_items(emb, i)
             return path
 
-        server.run(transport="stdio")
+    server.run(transport="stdio")
 
 
 def get_knowledge_path() -> Path:
