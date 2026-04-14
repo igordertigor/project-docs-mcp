@@ -1,6 +1,6 @@
-# know: A simple MCP knowledge base
+# project-docs-mcp: A simple MCP knowledge base
 
-This MCP server adds to tools to your agent:
+This MCP server adds two tools to your agent:
 
 1. `search_project_docs` performs semantic search through your project's knowledge base (default `docs/` directory)
 2. `store_project_docs` adds a new document to the project's knowledge base and indexes it.
