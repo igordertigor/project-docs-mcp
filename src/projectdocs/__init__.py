@@ -14,7 +14,7 @@ app = Typer()
 
 @app.command("index")
 def index():
-    path = get_knowledge_path()
+    path = get_docs_path()
     model = SentenceTransformer("all-MiniLM-L6-v2")
     with vector_index() as (idx, toc):
         for batch in itertools.batched(path.rglob("*.md"), 10):
@@ -28,15 +28,15 @@ def index():
 
 @app.command("mcp")
 def mcp():
-    server = FastMCP("know", json_response=True)
+    server = FastMCP("project-docs", json_response=True)
     model = SentenceTransformer("all-MiniLM-L6-v2")
 
 
     @server.tool()
-    def search_project_knowledge(
+    def search_project_docs(
         topic: str, limit: int = 5, threshold: float = 0.5
     ) -> list[str]:
-        """Search the project's knowledge base for content related to "topic".
+        """Search the project's docs for content related to "topic".
 
         Args;
             topic: Brief description of what to search for
@@ -55,8 +55,8 @@ def mcp():
             ]
 
     @server.tool()
-    def store_project_knowledge(title: str, text: str) -> Path:
-        """Store new project knowledge in the project's knowledge base
+    def store_project_docs(title: str, text: str) -> Path:
+        """Store new project documentation snippet in the project's docs
 
         Args:
             title: Title of the note
@@ -66,10 +66,10 @@ def mcp():
             Path of the stored model
         """
         with vector_index() as (idx, toc):
-            path = get_knowledge_path() / f"{title}.md"
+            path = get_docs_path() / f"{title}.md"
             i = 0
             while path.exists():
-                path = get_knowledge_path() / f"{title}-{i}.md"
+                path = get_docs_path() / f"{title}-{i}.md"
                 i += 1
             text = f"# {title}\n\n{text}"
             path.write_text(text)
@@ -81,16 +81,16 @@ def mcp():
     server.run(transport="stdio")
 
 
-def get_knowledge_path() -> Path:
-    return Path(os.environ.get("KNOWLEDGE_PATH", "docs"))
+def get_docs_path() -> Path:
+    return Path(os.environ.get("PROJECT_DOCS_PATH", "docs"))
 
 
 def get_index_file() -> Path:
-    return Path(os.environ.get("KNOWLEDGE_INDEX_FILE", ".knowledge"))
+    return Path(os.environ.get("PROJECT_DOCS_INDEX_FILE", ".project-docs.idx"))
 
 
 def get_toc_file() -> Path:
-    return Path(os.environ.get("KNOWLEDGE_TOC", ".knowledge-toc"))
+    return Path(os.environ.get("PROJECT_DOCS_TOC_FILE", ".project-docs-toc.json"))
 
 
 @contextmanager
