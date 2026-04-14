@@ -1,5 +1,5 @@
 [project]
-name = "know"
+name = "project-docs-mcp"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -26,7 +26,7 @@ explicit = true
 
 
 [project.scripts]
-know = "know:app"
+projectdocs = "projectdocs:app"
 
 [build-system]
 requires = ["uv_build>=0.9.6,<0.10.0"]
